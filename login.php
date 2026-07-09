@@ -2,18 +2,18 @@
 
 session_start();
 
-include "config/conexao.php";
+require_once "config/conexao.php";
 
-if ($_server["request_method"] != "POST") {
-    header(Location: index.php);
+if ($_server["request_method"] !== "POST") {
+    header("Location: index.php");
     exit;
 
 }
 
-$email = $_post["email"];
+$email = trim($_post["email"]);
 $senha = $_post["senha"];
 
-$sql = "SELECT *FROM usuarios Where email = '$email'";
+$sql = "SELECT *FROM usuarios Where email = ?";
 
 $resultado = $conexao->query($sql);
 
