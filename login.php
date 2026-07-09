@@ -4,18 +4,25 @@ session_start();
 
 require_once "config/conexao.php";
 
-if ($_server["request_method"] !== "POST") {
+if ($_SERVER["REQUEST_METHOD"] !== "POST") {
     header("Location: index.php");
     exit;
 
 }
 
-$email = trim($_post["email"]);
-$senha = $_post["senha"];
+$email = trim($_POST["email"]);
+$senha = $_POST["senha"];
 
-$sql = "SELECT *FROM usuarios Where email = ?";
+$sql = "SELECT * FROM usuarios Where email = ?";
 
-$resultado = $conexao->query($sql);
+$stmt = $conexao->prepare($sql);
+
+$stmt->bind_param("s", $email);
+
+$stmt->execute();
+
+$resultado = $stmt->get_result();
+
 
 
 if ($resultado->num_rows == 1) {
@@ -23,24 +30,30 @@ if ($resultado->num_rows == 1) {
     $usuario = $resultado->fetch_assoc();
 
 
-if ($usuario["senha"] == $senha) {
-    
-    $_session["id"] = $usuario["id"];
-    $_session["nome"] = $usuario["nome"];
-    $_session["email"] = $usuario["email"];
+} else {
 
-    header("location: dashboard.php");
+   $_SESSION["erro"] = "E-mail ou Senha inválidos.";
+   header("Location: index.php");
+    exit;
+
+}
+
+if (password_verify($senha, $usuario["senha"]))  {
+    
+    $_SESSION["id"] = $usuario["id"];
+    $_SESSION["nome"] = $usuario["nome"];
+    $_SESSION["email"] = $usuario["email"];
+    $_SESSION["perfil"] = $usuario["perfil"];
+
+    header("Location: dashboard.php");
     exit;
 
 
 } else {
 
-    echo "Senhas incorreta.";
+    $_SESSION["erro"] = "E-mail ou senha inválidos.";
+    header("Location: index.php");
+    exit;
 
 }
 
-} else {
-
-    echo "Usuario não encontrado.";
-    
-}
