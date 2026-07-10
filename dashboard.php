@@ -14,6 +14,8 @@ if (!isset($_SESSION["id"])) {
 
 ?>
 
+    <!--layout temporario para teste  -->
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
